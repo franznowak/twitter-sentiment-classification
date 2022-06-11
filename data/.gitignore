@@ -1,0 +1,7 @@
+train_*
+test_data.txt
+sample_submission.csv
+
+vocab_cut.txt
+vocab.pkl
+vocab.txt
