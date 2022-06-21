@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from typing import List, Tuple
 
-DIR = 'data'
+DIR = 'twitter-datasets'
 
 
 def _read_data(path: str) -> List[str]:
@@ -31,7 +31,7 @@ def load_train(full=False) -> pd.DataFrame:
 
   neg_rows = _read_data(neg_path)
   neg = pd.DataFrame({'x': neg_rows})
-  neg['y'] = 0
+  neg['y'] = -1
 
   return pd.concat([pos, neg], ignore_index=True).reset_index()
 
