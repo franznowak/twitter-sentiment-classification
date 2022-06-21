@@ -2,23 +2,23 @@ import pandas as pd
 import os
 from typing import List, Tuple, Union
 
-DIR = 'data'
+DIR = 'twitter-datasets'
 
 
 def _read_data(path: str) -> List[str]:
-    with open(path, 'r') as f:
-        return [x for x in f]
+  with open(path, 'r') as f:
+    return [x for x in f]
 
 
 def _read_data_with_ids(path: str) -> Tuple[List[str], List[str]]:
-    index = []
-    rows = []
-    with open(path, 'r') as f:
-        for line in f:
-            id, x = line.split(',', maxsplit=1)
-            index.append(id)
-            rows.append(x)
-    return index, rows
+  index = []
+  rows = []
+  with open(path, 'r') as f:
+    for line in f:
+      id, x = line.split(',', maxsplit=1)
+      index.append(id)
+      rows.append(x)
+  return index, rows
 
 
 def load_train(full=False, dir=DIR, eval_frac=None, cols=None) -> Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]:
