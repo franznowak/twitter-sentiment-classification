@@ -21,7 +21,7 @@ def _read_data_with_ids(path: str) -> Tuple[List[str], List[str]]:
   return index, rows
 
 
-def load_train(full=False, dir=DIR, eval_frac=None, cols=None) -> Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]:
+def load_train(full=False, dir=DIR, eval_frac=None, cols=None, neg_label=-1) -> Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]]:
     if cols is None:
         cols = ['x', 'y']
     pos_path = os.path.join(dir, 'train_pos' + ('_full' if full else '') + '.txt')
@@ -33,7 +33,7 @@ def load_train(full=False, dir=DIR, eval_frac=None, cols=None) -> Union[pd.DataF
 
     neg_rows = _read_data(neg_path)
     neg = pd.DataFrame({cols[0]: neg_rows})
-    neg[cols[1]] = 0
+    neg[cols[1]] = neg_label
 
     df = pd.concat([pos, neg], ignore_index=True).reset_index()
     if eval_frac is None:
