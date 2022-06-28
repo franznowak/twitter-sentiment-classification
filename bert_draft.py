@@ -58,6 +58,11 @@ def get_BERT(model_name=MODEL):
     return model
 
 
+try:
+    os.makedirs("bert_data")
+except FileExistsError:
+    pass
+
 model = get_BERT()
 training_args = TrainingArguments(output_dir="bert_data/test_trainer",
                                   num_train_epochs=EPOCHS,
@@ -87,10 +92,6 @@ trainer = Trainer(
 trainer.train()
 # trainer.evaluate()
 
-try:
-    os.makedirs("bert_data")
-except FileExistsError:
-    pass
 train_pred = trainer.predict(train_tokenized)
 df_train['Prediction'] = np.argmax(train_pred.predictions, axis=1)
 df_train.to_csv("bert_data/bert_pred_train.csv")
