@@ -24,7 +24,7 @@ def tokenize_function(ds):
     return tokenizer(ds['text'], padding=True, truncation=True)  # , return_tensors="pt"
 
 
-df_train, df_val = load_train(full=False, dir="twitter-datasets", eval_frac=0.2, cols=["text", "label"])
+df_train, df_val = load_train(full=False, dir="twitter-datasets", eval_frac=0.2, cols=["text", "label"], neg_label=0)
 dataset_train = Dataset.from_pandas(df_train)
 
 if VERBOSE:
