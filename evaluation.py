@@ -1,7 +1,8 @@
 from cmath import log
 import numpy as np
+import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, log_loss, roc_auc_score
-from typing import Tuple
+from typing import Callable, Tuple
 import logging
 
 
@@ -44,4 +45,15 @@ def evaluate(y: np.array, y_pred: np.array) -> Tuple[float, float, float, float,
   _log_metrics({'accuracy': accuracy, 'precision': precision, 'recall': recall, 'f1': f1, 'bce': bce, 'auc': auc})
 
   return accuracy, precision, recall, f1, bce, auc
+
+
+def evaluate_model(model: Callable[[pd.DataFrame], np.array], df: pd.DataFrame) -> Tuple[float, float, float, float, float, float]:
+  """
+  Expects a dataframe with columns `x` and `y`.
+  """
+
+  y = df['y'].to_numpy()
+  y_pred = model(df)
+
+  return evaluate(y, y_pred)
 
