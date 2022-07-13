@@ -4,6 +4,7 @@ pandas==1.4.2
 scikit-learn==1.1.1
 scipy==1.8.1
 torch==1.11.0
+textblob==0.17.0
 
 transformers~=4.20.0
 datasets~=2.3.2
