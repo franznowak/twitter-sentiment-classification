@@ -20,5 +20,5 @@ def tokenize(df: pd.DataFrame):
 def remove_stopwords(df: pd.DataFrame):
   df['x'] = df.x.apply(lambda tokens: [w for w in tokens if not w in stop_words])
 
-def lemmatize(df: pd.DataFrame):  
+def lemmatize(df: pd.DataFrame):
   df['x'] = df.x.apply(lambda tokens: [lemmatizer.lemmatize(w) for w in tokens])

@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from typing import List, Tuple, Union
 
-DIR = 'data'
+DIR = 'twitter-datasets'
 
 
 def _read_data(path: str) -> List[str]:

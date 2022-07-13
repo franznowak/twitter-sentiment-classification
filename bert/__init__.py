@@ -1,16 +1,30 @@
 from pathlib import Path
-import logging
-import torch
 import numpy as np
+from sklearn.metrics import accuracy_score
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer
 from datasets import Dataset, ClassLabel, load_metric
 
 from evaluation import evaluate
-from loading import load_train, load_test
+from loading import load_train
+from preprocessing import remove_tags, tokenize as pp_tokenize, remove_stopwords, lemmatize
 
 
 def load(full=False, preprocessing=None):
   df_train, df_val = load_train(full=full, eval_frac=0.2, x_col='text', y_col='label', neg_label=0, pos_label=1)
+
+  if preprocessing['remove_tags']:
+    remove_tags(df_train)
+    remove_tags(df_val)
+  if preprocessing['tokenize']:
+    pp_tokenize(df_train)
+    pp_tokenize(df_val)
+  if preprocessing['remove_stopwords']:
+    remove_stopwords(df_train)
+    remove_stopwords(df_val)
+  if preprocessing['lemmatize']:
+    lemmatize(df_train)
+    lemmatize(df_val)
+
   dataset_train = Dataset.from_pandas(df_train)
   dataset_val = Dataset.from_pandas(df_val)
 
@@ -23,19 +37,19 @@ def load(full=False, preprocessing=None):
   return dataset_train, dataset_val
 
 
-def tokenize(ds, tokenizer, path, force_retokenize=False):
+def tokenize(ds, tokenizer, path):
   def tokenize_function(ds):
     return tokenizer(ds['text'], padding=True, truncation=True)
 
-  def load_or_tokenize(ds, path, force_retokenize=False):
-    if not force_retokenize and Path(path).exists():
+  def load_or_tokenize(ds, path):
+    if Path(path).exists():
       return Dataset.load_from_disk(path)
     else:
       ds_tokenized = ds.map(tokenize_function, batched=True)
       ds_tokenized.save_to_disk(path)
       return ds_tokenized
 
-  return load_or_tokenize(ds, path=path, force_retokenize=force_retokenize)
+  return load_or_tokenize(ds, path=path)
 
 
 def get_BERT(model_name, device):
@@ -44,24 +58,24 @@ def get_BERT(model_name, device):
   return model
 
 
-def train(model_name, tokenizer_name, device, full=False, force_retokenize=False, preprocessing=None, batch_size=32, epochs=1):
+def train(model_name, tokenizer_name, device, full=False, preprocessing=None, batch_size=32, epochs=1):
   dataset_train, dataset_val = load(full=full, preprocessing=preprocessing)
 
   tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
-  train_tokenized = tokenize(dataset_train, tokenizer, path='bert/train_tokenized', force_retokenize=force_retokenize)
-  val_tokenized = tokenize(dataset_val, tokenizer, path='bert/val_tokenized', force_retokenize=force_retokenize)
+  train_tokenized = tokenize(dataset_train, tokenizer, path=f'bert/cache/train_tokenized__{tokenizer_name}')
+  val_tokenized = tokenize(dataset_val, tokenizer, path=f'bert/cache/val_tokenized__{tokenizer_name}')
 
   model = get_BERT(model_name, device)
 
   training_args = TrainingArguments(
-    output_dir="bert_data/test_trainer",
+    output_dir='bert_data/test_trainer',
     num_train_epochs=epochs,
-    save_strategy="epoch",
-    evaluation_strategy="epoch",
+    save_strategy='epoch',
+    evaluation_strategy='epoch',
     per_device_train_batch_size=batch_size,
     load_best_model_at_end=True)
 
-  metric = load_metric("accuracy")
+  metric = load_metric('accuracy')
   def compute_metrics(eval_pred):
     predictions, labels = eval_pred
     predictions = np.argmax(predictions, axis=1)
@@ -77,6 +91,13 @@ def train(model_name, tokenizer_name, device, full=False, force_retokenize=False
 
   trainer.train()
 
+  val_pred = trainer.predict(val_tokenized)
+  y_pred = np.argmax(val_pred.predictions, axis=1)
+  y = val_tokenized.to_pandas()['label']
+  accuracy, _, _, _, _, _ = evaluate(y, y_pred)
+  return model, accuracy
 
-def objective(args, model_name, tokenizer_name, device, full=False, force_retokenize=False):
-  return train(model_name, tokenizer_name, device, full=full, force_retokenize=force_retokenize, **args)
+
+def objective(args, model_name, tokenizer_name, device, full=False):
+  _, accuracy = train(model_name, tokenizer_name, device, full=full, **args)
+  return accuracy
