@@ -26,19 +26,19 @@ def load(full=False, preprocessing=None):
   return dataset_train, dataset_val
 
 
-def tokenize(ds, tokenizer, path):
+def tokenize(ds, tokenizer, path, force=True):
   def tokenize_function(ds):
     return tokenizer(ds['text'], padding=True, truncation=True)
 
-  def load_or_tokenize(ds, path):
-    if Path(path).exists():
+  def load_or_tokenize(ds, path, force):
+    if not force and Path(path).exists():
       return Dataset.load_from_disk(path)
     else:
       ds_tokenized = ds.map(tokenize_function, batched=True)
       ds_tokenized.save_to_disk(path)
       return ds_tokenized
 
-  return load_or_tokenize(ds, path=path)
+  return load_or_tokenize(ds, path=path, force=force)
 
 
 def get_BERT(model_name, device):
@@ -47,12 +47,20 @@ def get_BERT(model_name, device):
   return model
 
 
-def train(model_name, tokenizer_name, device, full=False, preprocessing=None, batch_size=32, epochs=1):
+def train(model_name, tokenizer_name, device, full=False, preprocessing=None, batch_size=32, epochs=1, force_tokenize=True):
   dataset_train, dataset_val = load(full=full, preprocessing=preprocessing)
 
   tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
-  train_tokenized = tokenize(dataset_train, tokenizer, path=f'bert/cache/train_tokenized__{tokenizer_name}{"__full" if full else ""}')
-  val_tokenized = tokenize(dataset_val, tokenizer, path=f'bert/cache/val_tokenized__{tokenizer_name}{"__full" if full else ""}')
+  train_tokenized = tokenize(
+    dataset_train,
+    tokenizer,
+    path=f'bert/cache/train_tokenized__{tokenizer_name}{"__full" if full else ""}',
+    force=force_tokenize)
+  val_tokenized = tokenize(
+    dataset_val,
+    tokenizer,
+    path=f'bert/cache/val_tokenized__{tokenizer_name}{"__full" if full else ""}',
+    force=force_tokenize)
 
   model = get_BERT(model_name, device)
 
