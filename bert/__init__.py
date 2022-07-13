@@ -1,6 +1,5 @@
 from pathlib import Path
 import numpy as np
-from sklearn.metrics import accuracy_score
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer
 from datasets import Dataset, ClassLabel, load_metric
 
@@ -52,8 +51,8 @@ def train(model_name, tokenizer_name, device, full=False, preprocessing=None, ba
   dataset_train, dataset_val = load(full=full, preprocessing=preprocessing)
 
   tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
-  train_tokenized = tokenize(dataset_train, tokenizer, path=f'bert/cache/train_tokenized__{tokenizer_name}')
-  val_tokenized = tokenize(dataset_val, tokenizer, path=f'bert/cache/val_tokenized__{tokenizer_name}')
+  train_tokenized = tokenize(dataset_train, tokenizer, path=f'bert/cache/train_tokenized__{tokenizer_name}{"__full" if full else ""}')
+  val_tokenized = tokenize(dataset_val, tokenizer, path=f'bert/cache/val_tokenized__{tokenizer_name}{"__full" if full else ""}')
 
   model = get_BERT(model_name, device)
 
@@ -84,10 +83,11 @@ def train(model_name, tokenizer_name, device, full=False, preprocessing=None, ba
   val_pred = trainer.predict(val_tokenized)
   y_pred = np.argmax(val_pred.predictions, axis=1)
   y = val_tokenized.to_pandas()['label']
-  accuracy, _, _, _, _, _ = evaluate(y, y_pred)
-  return model, accuracy
+  metrics = evaluate(y, y_pred)
+  return model, metrics
 
 
 def objective(args, model_name, tokenizer_name, device, full=False):
-  _, accuracy = train(model_name, tokenizer_name, device, full=full, **args)
-  return accuracy
+  print(args)
+  _, metrics = train(model_name, tokenizer_name, device, full=full, **args)
+  return -metrics['accuracy']
