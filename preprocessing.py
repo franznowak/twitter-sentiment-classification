@@ -5,6 +5,7 @@ from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import WhitespaceTokenizer
 from nltk.corpus import stopwords
 from textblob import Word
+from tqdm import tqdm
 
 nltk.download('stopwords')
 nltk.download('omw-1.4')
@@ -13,6 +14,8 @@ stop_words = set(stopwords.words('english'))
 nltk.download('wordnet')
 tokenizer = WhitespaceTokenizer()
 lemmatizer = WordNetLemmatizer()
+
+tqdm.pandas()
 
 def tokenize(df: pd.DataFrame, x_col='x'):
   """
@@ -56,7 +59,7 @@ def spelling_correction(df: pd.DataFrame, x_col='x'):
   """
   To be applied to a dataframe with a column called 'x' that contains tokens.
   """
-  df[x_col] = df[x_col].apply(lambda tokens: [Word(w).correct() for w in tokens])
+  df[x_col] = df[x_col].progress_apply(lambda tokens: [Word(w).correct() for w in tokens])
 
 
 def preprocess(df: pd.DataFrame, flags: Optional[Dict[str, bool]], x_col='x'):
