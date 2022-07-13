@@ -1,3 +1,4 @@
+from typing import Dict, Optional
 import pandas as pd
 import nltk
 from nltk.stem import WordNetLemmatizer
@@ -22,3 +23,15 @@ def remove_stopwords(df: pd.DataFrame):
 
 def lemmatize(df: pd.DataFrame):
   df['x'] = df.x.apply(lambda tokens: [lemmatizer.lemmatize(w) for w in tokens])
+
+
+def preprocess(df: pd.DataFrame, flags: Optional[Dict[str, bool]]):
+  if flags is not None:
+    if flags['remove_tags']:
+      remove_tags(df)
+    if flags['tokenize']:
+      tokenize(df)
+    if flags['remove_stopwords']:
+      remove_stopwords(df)
+    if flags['lemmatize']:
+      lemmatize(df)

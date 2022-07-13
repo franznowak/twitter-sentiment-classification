@@ -6,25 +6,14 @@ from datasets import Dataset, ClassLabel, load_metric
 
 from evaluation import evaluate
 from loading import load_train
-from preprocessing import remove_tags, tokenize as pp_tokenize, remove_stopwords, lemmatize
+from preprocessing import preprocess
 
 
 def load(full=False, preprocessing=None):
   df_train, df_val = load_train(full=full, eval_frac=0.2, x_col='text', y_col='label', neg_label=0, pos_label=1)
 
-  if preprocessing is not None:
-    if preprocessing['remove_tags']:
-      remove_tags(df_train)
-      remove_tags(df_val)
-    if preprocessing['tokenize']:
-      pp_tokenize(df_train)
-      pp_tokenize(df_val)
-    if preprocessing['remove_stopwords']:
-      remove_stopwords(df_train)
-      remove_stopwords(df_val)
-    if preprocessing['lemmatize']:
-      lemmatize(df_train)
-      lemmatize(df_val)
+  preprocess(df_train, flags=preprocessing)
+  preprocess(df_val, flags=preprocessing)
 
   dataset_train = Dataset.from_pandas(df_train)
   dataset_val = Dataset.from_pandas(df_val)
