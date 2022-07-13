@@ -7,6 +7,7 @@ from nltk.corpus import stopwords
 from textblob import Word
 
 nltk.download('stopwords')
+nltk.download('omw-1.4')
 stop_words = set(stopwords.words('english'))
 
 nltk.download('wordnet')
