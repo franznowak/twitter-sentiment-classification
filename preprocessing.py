@@ -39,7 +39,7 @@ def remove_stopwords(df: pd.DataFrame, x_col='x'):
   """
   df[x_col] = df[x_col].apply(lambda tokens: [w for w in tokens if not w in stop_words])
 
-def lemmatize(df: pd.DataFrame, x_col='x'):  
+def lemmatize(df: pd.DataFrame, x_col='x'):
   """
   To be applied to a dataframe with a column called 'x' that contains tokens.
   """
@@ -60,11 +60,17 @@ def spelling_correction(df: pd.DataFrame, x_col='x'):
 
 def preprocess(df: pd.DataFrame, flags: Optional[Dict[str, bool]], x_col='x'):
   if flags is not None:
-    if flags['remove_tags']:
-      remove_tags(df, x_col=x_col)
-    if flags['tokenize']:
+    if flags.get('tokenize', False):
       tokenize(df, x_col=x_col)
-    if flags['remove_stopwords']:
+    if flags.get('remove_tags', False):
+      remove_tags(df, x_col=x_col)
+    if flags.get('remove_tag_tokens', False):
+      remove_tag_tokens(df, x_col=x_col)
+    if flags.get('remove_stopwords', False):
       remove_stopwords(df, x_col=x_col)
-    if flags['lemmatize']:
+    if flags.get('lemmatize', False):
       lemmatize(df, x_col=x_col)
+    if flags.get('remove_single_symbols', False):
+      remove_single_symbols(df, x_col=x_col)
+    if flags.get('spelling_correction', False):
+      spelling_correction(df, x_col=x_col)
