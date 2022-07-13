@@ -11,8 +11,8 @@ from preprocessing import preprocess
 def load(full=False, preprocessing=None):
   df_train, df_val = load_train(full=full, eval_frac=0.2, x_col='text', y_col='label', neg_label=0, pos_label=1)
 
-  preprocess(df_train, flags=preprocessing)
-  preprocess(df_val, flags=preprocessing)
+  preprocess(df_train, flags=preprocessing, x_col='text')
+  preprocess(df_val, flags=preprocessing, x_col='text')
 
   dataset_train = Dataset.from_pandas(df_train)
   dataset_val = Dataset.from_pandas(df_val)
