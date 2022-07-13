@@ -33,7 +33,7 @@ def load_train(full=False, dir=DIR, eval_frac=None, x_col='x', y_col='y', neg_la
   neg = pd.DataFrame({x_col: neg_rows})
   neg[y_col] = neg_label
 
-  df = pd.concat([pos, neg], ignore_index=True).reset_index()
+  df = pd.concat([pos, neg], ignore_index=True).sample(frac=1).reset_index()
   if eval_frac is None:
     return df
   else:
