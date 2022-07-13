@@ -99,7 +99,7 @@ df_train['log_neg'] = train_pred.predictions[:, 0]
 df_train['log_pos'] = train_pred.predictions[:, 1]
 # store logits, e.g. for ensemble learning, ..
 df_train.to_csv("bert_data/bert_pred_train_logits.csv")
-acc_train, prec_train, recall_train, f1_train, bce_train, auc_train = evaluate(df_train['Prediction'], df_train[
+metrics_train = evaluate(df_train['Prediction'], df_train[
     "label"])
 
 val_pred = trainer.predict(val_tokenized)
@@ -108,7 +108,7 @@ df_val.to_csv("bert_data/bert_pred_val.csv")
 df_val['log_neg'] = val_pred.predictions[:, 0]
 df_val['log_pos'] = val_pred.predictions[:, 1]
 df_val.to_csv("bert_data/bert_pred_val_logits.csv")
-acc_val, prec_val, recall_val, f1_val, bce_val, auc_val = evaluate(df_val['Prediction'], df_val["label"])
+metrics_val = evaluate(df_val['Prediction'], df_val["label"])
 
 test_pred = trainer.predict(test_tokenized)
 df_test['Prediction'] = np.argmax(test_pred.predictions, axis=1)
