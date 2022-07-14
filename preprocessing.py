@@ -5,6 +5,7 @@ from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import WhitespaceTokenizer
 from nltk.corpus import stopwords
 from textblob import Word
+from textblob import TextBlob
 from tqdm import tqdm
 
 nltk.download('stopwords')
@@ -17,10 +18,15 @@ lemmatizer = WordNetLemmatizer()
 
 tqdm.pandas()
 
+def to_lower(df: pd.DataFrame, x_col='x'):
+  """
+  To be applied to a dataframe with a column called 'x' that contains sentences.
+  """
+  df[x_col] = df[x_col].apply(lambda sentence: sentence.lower())
+
 def tokenize(df: pd.DataFrame, x_col='x'):
   """
   To be applied to a dataframe with a column called 'x' that contains sentences.
-  Run this first before applying other preprocessing steps!
   """
   df[x_col] = df[x_col].apply(lambda sentence: tokenizer.tokenize(sentence))
 
@@ -62,10 +68,28 @@ def spelling_correction(df: pd.DataFrame, x_col='x'):
   df[x_col] = df[x_col].progress_apply(lambda tokens: [Word(w).correct() for w in tokens])
 
 
+def replace_user_handles(df: pd.DataFrame, x_col='x'):
+  """
+  To be applied to a dataframe with a column called 'x' that contains tokens.
+  """
+  df[x_col] = df[x_col].apply(lambda tokens: [w if not (w.startswith("@") and len(w) > 1) else "<user>" for w in tokens])
+
+def replace_urls(df: pd.DataFrame, x_col='x'):
+  """
+  To be applied to a dataframe with a column called 'x' that contains tokens.
+  """
+  df[x_col] = df[x_col].apply(lambda tokens: [w if not (w.startswith("http://") or w.startswith("https://") or w.startswith("www.")) else "<url>" for w in tokens])
+
 def preprocess(df: pd.DataFrame, flags: Optional[Dict[str, bool]], x_col='x'):
   if flags is not None:
+    if flags.get('to_lower', False):
+      to_lower(df, x_col=x_col)
     if flags.get('tokenize', False):
       tokenize(df, x_col=x_col)
+    if flags.get('replace_user_handles', False):
+      replace_user_handles(df, x_col=x_col)
+    if flags.get('replace_urls', False):
+      replace_urls(df, x_col=x_col)  
     if flags.get('remove_tags', False):
       remove_tags(df, x_col=x_col)
     if flags.get('remove_tag_tokens', False):
