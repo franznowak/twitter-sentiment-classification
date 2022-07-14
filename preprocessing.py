@@ -80,6 +80,12 @@ def replace_urls(df: pd.DataFrame, x_col='x'):
   """
   df[x_col] = df[x_col].apply(lambda tokens: [w if not (w.startswith("http://") or w.startswith("https://") or w.startswith("www.")) else "<url>" for w in tokens])
 
+def untokenize(df: pd.DataFrame, x_col='x'):
+  """
+  To be applied to a dataframe with a column called 'x' that contains tokens.
+  """
+  df[x_col] = df[x_col].apply(lambda tokens: " ".join(tokens))
+
 def preprocess(df: pd.DataFrame, flags: Optional[Dict[str, bool]], x_col='x'):
   if flags is not None:
     if flags.get('to_lower', False):
