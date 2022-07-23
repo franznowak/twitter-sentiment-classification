@@ -57,7 +57,7 @@ def compute_metrics(eval_pred):
 
   prob_estimates = softmax(predictions, axis=1)[:, 1]
   prob_estimates_eval = evaluate_prob(labels, prob_estimates)
-  confidence = np.max(prob_estimates, axis=1)
+  confidence = np.max(predictions, axis=1)
   all_confidence = confidence.mean()
   all_confidence_std = confidence.std()
   correct_confidence = confidence[labels == point_estimates].mean()
