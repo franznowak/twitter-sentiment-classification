@@ -41,8 +41,8 @@ def evaluate(y: np.array, y_pred: np.array) -> Dict[str, float]:
   precision = precision_score(y, y_pred)
   recall = recall_score(y, y_pred)
   f1 = f1_score(y, y_pred)
-  prob_metrics = evaluate_prob(y, y_pred, verbose=False)
-  result = {'accuracy': accuracy, 'precision': precision, 'recall': recall, 'f1': f1, **prob_metrics}
+  # prob_metrics = evaluate_prob(y, y_pred, verbose=False)
+  result = {'accuracy': accuracy, 'precision': precision, 'recall': recall, 'f1': f1}
 
   _log_metrics(result)
   return result
