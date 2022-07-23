@@ -1,7 +1,14 @@
 import logging
+import os
+
+import datasets
 import torch
+from prettytable import PrettyTable
+
 from bert import *
 from transformers import AutoTokenizer
+
+from util import set_trainable
 
 logging.basicConfig(level=logging.INFO)
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -11,11 +18,20 @@ FORCE = True
 
 MODEL = 'distilbert-base-uncased'
 TOKENIZER = 'bert-base-uncased'
+FT = 'CLASS_LNORM'  # mode of fine-tuning
+# 'CLASS_LNORM': train classifier and layer norm parameters
+# 'PREC_CLASS': pre-classifier and classifier
 
-EPOCHS = 1
-BATCH_SIZE = 32
+EPOCHS = 2
+BATCH_SIZE = 16
 
-IDENT = '_'.join([MODEL, "ep", str(EPOCHS)])
+IDENT = '_'.join([MODEL, "ep", str(EPOCHS), "bs", str(BATCH_SIZE), str(FT), "2"])
+DIR = "bert_data/" + IDENT
+
+try:
+    os.makedirs(DIR)
+except FileExistsError:
+    pass
 
 dataset_train, dataset_val = load(full=FULL, preprocessing=None)
 tokenizer = AutoTokenizer.from_pretrained(TOKENIZER)
@@ -31,18 +47,17 @@ val_tokenized = tokenize(
     force=FORCE)
 
 model = get_BERT(MODEL, device)
-print(model)
 
 for param in model.parameters():
     param.requires_grad = False
 
-for param in model.pre_classifier.parameters():
-    param.requires_grad = True
-
 for param in model.classifier.parameters():
     param.requires_grad = True
 
-training_args = TrainingArguments(output_dir="bert_data/test_trainer",
+
+set_trainable(model)
+
+training_args = TrainingArguments(output_dir=DIR,
                                   num_train_epochs=EPOCHS,
                                   save_strategy="epoch",
                                   evaluation_strategy="epoch",
