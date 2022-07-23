@@ -1,7 +1,8 @@
+import os
 import pandas as pd
 
-df_train = pd.read_csv('train_test/train.csv')
-df_eval = pd.read_csv('train_test/test.csv')
+df_train = pd.read_csv(os.path.join(os.path.dirname(__file__), 'train_test/train.csv'))
+df_eval = pd.read_csv(os.path.join(os.path.dirname(__file__), 'train_test/test.csv'))
 
 
 def select_train(size=160_000):
