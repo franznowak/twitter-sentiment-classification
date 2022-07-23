@@ -37,7 +37,7 @@ def set_trainable(model):
     return count_parameters(model)[0]
 
 
-def analyze_misclass(y_pred_logits, y_pred, y_true):
+def analyze_misclass(y_pred_logits, y_pred, y_true, name1="boxplot", name2="histogram"):
     normed_logits = scipy.special.softmax(y_pred_logits, axis=1)
     df = pd.DataFrame({'log_1': normed_logits[:, 0], 'log_2': normed_logits[:, 1], 'y_pred': y_pred, 'y_true': y_true})
     df['log_diff'] = (df['log_1'] - df['log_2']).abs()
@@ -49,12 +49,13 @@ def analyze_misclass(y_pred_logits, y_pred, y_true):
     plt.ioff()
 
     df.boxplot(column=['diff_correct', 'diff_incorrect'])
-    plt.show()
+    plt.savefig(name1+".png")
     plt.close()
+    plt.pause(0.1)
 
     plt.hist([df['diff_incorrect'], df['diff_correct']], bins=60, label=["Misclassified", "Correct"])
     plt.legend()
-    plt.show()
+    plt.savefig(name2+".png")
     plt.close()
 
     return mean_diff_correct, mean_diff_incorrect, df
