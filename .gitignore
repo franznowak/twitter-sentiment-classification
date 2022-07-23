@@ -136,3 +136,5 @@ twitter-datasets
 # Submissions
 submission.csv
 test_submission.csv
+
+train_test
