@@ -1,3 +1,8 @@
+import scipy
+import scipy.special
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 from prettytable import PrettyTable
 
 
@@ -30,3 +35,27 @@ def set_trainable(model):
 
     print(count)
     return count_parameters(model)[0]
+
+
+def analyze_misclass(y_pred_logits, y_pred, y_true):
+    normed_logits = scipy.special.softmax(y_pred_logits, axis=1)
+    df = pd.DataFrame({'log_1': normed_logits[:, 0], 'log_2': normed_logits[:, 1], 'y_pred': y_pred, 'y_true': y_true})
+    df['log_diff'] = (df['log_1'] - df['log_2']).abs()
+    df['diff_incorrect'] = df.loc[df['y_pred'] != df['y_true'], ['log_diff']]
+    df['diff_correct'] = df.loc[df['y_pred'] == df['y_true'], ['log_diff']]
+    mean_diff_correct = df['diff_correct'].mean()
+    mean_diff_incorrect = df['diff_incorrect'].mean()
+
+    plt.ioff()
+
+    df.boxplot(column=['diff_correct', 'diff_incorrect'])
+    plt.show()
+    plt.close()
+
+    plt.hist([df['diff_incorrect'], df['diff_correct']], bins=60, label=["Misclassified", "Correct"])
+    plt.legend()
+    plt.show()
+    plt.close()
+
+    return mean_diff_correct, mean_diff_incorrect, df
+
