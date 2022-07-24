@@ -1,22 +1,35 @@
+import os
 import pandas as pd
 
-df_train = pd.read_csv('train_test/train.csv')
-df_eval = pd.read_csv('train_test/test.csv')
+DF_TRAIN = pd.read_csv(os.path.join(os.path.dirname(__file__), 'train_test/train.csv'))
+DF_EVAL = pd.read_csv(os.path.join(os.path.dirname(__file__), 'train_test/test.csv'))
 
 
 def select_train(size=160_000):
-  return df_train.iloc[:size].drop(['Unnamed: 0'], axis='columns')
+  df = DF_TRAIN
+  if size is not None:
+    df = df.iloc[:size]
+  return df.drop(['Unnamed: 0'], axis='columns')
 
 
 def select_train_with_cluster(df_cluster_map: pd.DataFrame, cluster: int, size=160_000):
-  df = pd.merge(df_train, df_cluster_map, on='index')
-  return df[df['cluster'] == cluster].iloc[:size].drop(['Unnamed: 0'], axis='columns')
+  df = pd.merge(DF_TRAIN, df_cluster_map, on='index')
+  df = df[df['cluster'] == cluster]
+  if size is not None:
+    df = df.iloc[:size]
+  return df.drop(['Unnamed: 0'], axis='columns')
 
 
 def select_eval(size=40_000):
-  return df_eval.iloc[:size].drop(['Unnamed: 0'], axis='columns')
+  df = DF_EVAL
+  if size is not None:
+    df = df.iloc[:size]
+  return df.iloc[:size].drop(['Unnamed: 0'], axis='columns')
 
 
 def select_eval_with_cluster(df_cluster_map: pd.DataFrame, cluster: int, size=40_000):
-  df = pd.merge(df_eval, df_cluster_map, on='index')
-  return df[df['cluster'] == cluster].iloc[:size].drop(['Unnamed: 0'], axis='columns')
+  df = pd.merge(DF_EVAL, df_cluster_map, on='index')
+  df = df[df['cluster'] == cluster]
+  if size is not None:
+    df = df.iloc[:size]
+  return df.drop(['Unnamed: 0'], axis='columns')
