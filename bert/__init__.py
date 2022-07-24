@@ -9,22 +9,15 @@ from loading import load_train
 from preprocessing import preprocess
 
 
-def load(df_train, df_val, preprocessing=None):
-  # df_train, df_val = load_train(full=full, eval_frac=0.2, x_col='text', y_col='label', neg_label=0, pos_label=1)
+def prepare_dataset(df, preprocessing=None):
+  preprocess(df, flags=preprocessing, x_col='text')
+  dataset = Dataset.from_pandas(df)
 
-  preprocess(df_train, flags=preprocessing, x_col='text')
-  preprocess(df_val, flags=preprocessing, x_col='text')
-
-  dataset_train = Dataset.from_pandas(df_train)
-  dataset_val = Dataset.from_pandas(df_val)
-
-  new_features = dataset_train.features.copy()
+  new_features = dataset.features.copy()
   new_features['label'] = ClassLabel(names=['0', '1'])
 
-  dataset_train = dataset_train.cast(new_features)
-  dataset_val = dataset_val.cast(new_features)
-
-  return dataset_train, dataset_val
+  dataset = dataset.cast(new_features)
+  return dataset
 
 
 def tokenize(ds, tokenizer, path=None, force=True):
@@ -57,7 +50,7 @@ def compute_metrics(eval_pred):
 
   prob_estimates = softmax(predictions, axis=1)[:, 1]
   prob_estimates_eval = evaluate_prob(labels, prob_estimates)
-  confidence = np.max(prob_estimates, axis=1)
+  confidence = np.max(softmax(predictions, axis=1), axis=1)
   all_confidence = confidence.mean()
   all_confidence_std = confidence.std()
   correct_confidence = confidence[labels == point_estimates].mean()
@@ -78,7 +71,8 @@ def compute_metrics(eval_pred):
 
 
 def train(model_name, tokenizer_name, device, df_train, df_val, preprocessing=None, batch_size=32, epochs=1, force_tokenize=True):
-  dataset_train, dataset_val = load(df_train, df_val, preprocessing=preprocessing)
+  dataset_train = prepare_dataset(df_train, preprocessing=preprocessing)
+  dataset_val = prepare_dataset(df_val, preprocessing=preprocessing)
 
   tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
   train_tokenized = tokenize(
