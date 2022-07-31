@@ -19,6 +19,10 @@ The default setting is (LN). If you wish to change it to (O), the parameter `tra
 
 ## Naive Bayes
 
+To replicate the results of the Naive Bayes classifier, use the notebook ``naive_bayes.ipynb``.
+
 ## XGBoost
+
+The experiments of the XGBoost experiments can be found in ``xgboost_with_glove.ipynb``
 
 ## Logistic Regression
