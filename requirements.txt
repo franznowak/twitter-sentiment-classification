@@ -11,3 +11,6 @@ textblob~=0.17.0
 torch~=1.11.0
 xgboost==1.6.1
 transformers~=4.20.0
+
+tqdm~=4.64.0
+prettytable~=3.3.0
