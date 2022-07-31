@@ -1,15 +1,15 @@
 import os
 import pandas as pd
 
-DF_TRAIN = pd.read_csv(os.path.join(os.path.dirname(__file__), 'train_test/train.csv'))
-DF_EVAL = pd.read_csv(os.path.join(os.path.dirname(__file__), 'train_test/test.csv'))
+DF_TRAIN = pd.read_csv(os.path.join(os.path.dirname(__file__), 'train_test/train.csv'))[['index', 'text', 'label']]
+DF_EVAL = pd.read_csv(os.path.join(os.path.dirname(__file__), 'train_test/test.csv'))[['index', 'text', 'label']]
 
 
 def select_train(size=160_000):
   df = DF_TRAIN
   if size is not None:
     df = df.iloc[:size]
-  return df.drop(['Unnamed: 0'], axis='columns')
+  return df
 
 
 def select_train_with_cluster(df_cluster_map: pd.DataFrame, cluster: int, size=160_000):
@@ -17,14 +17,14 @@ def select_train_with_cluster(df_cluster_map: pd.DataFrame, cluster: int, size=1
   df = df[df['cluster'] == cluster]
   if size is not None:
     df = df.iloc[:size]
-  return df.drop(['Unnamed: 0'], axis='columns')
+  return df
 
 
 def select_eval(size=40_000):
   df = DF_EVAL
   if size is not None:
     df = df.iloc[:size]
-  return df.iloc[:size].drop(['Unnamed: 0'], axis='columns')
+  return df
 
 
 def select_eval_with_cluster(df_cluster_map: pd.DataFrame, cluster: int, size=40_000):
@@ -32,4 +32,4 @@ def select_eval_with_cluster(df_cluster_map: pd.DataFrame, cluster: int, size=40
   df = df[df['cluster'] == cluster]
   if size is not None:
     df = df.iloc[:size]
-  return df.drop(['Unnamed: 0'], axis='columns')
+  return df

@@ -5,7 +5,6 @@ from datasets import Dataset, ClassLabel
 from scipy.special import softmax
 
 from evaluation import evaluate, evaluate_prob
-from loading import load_train
 from preprocessing import preprocess
 
 
@@ -111,9 +110,3 @@ def train(model_name, tokenizer_name, device, df_train, df_val, preprocessing=No
   # y = val_tokenized.to_pandas()['label']
   # metrics = evaluate(y, y_pred)
   return model
-
-
-def objective(args, model_name, tokenizer_name, device, full=False):
-  print(args)
-  _, metrics = train(model_name, tokenizer_name, device, full=full, **args)
-  return -metrics['accuracy']
