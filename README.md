@@ -26,3 +26,5 @@ To replicate the results of the Naive Bayes classifier, use the notebook ``naive
 The experiments of the XGBoost experiments can be found in ``xgboost_with_glove.ipynb``
 
 ## Logistic Regression
+
+To replicate the results of our logistic regression baseline, which uses fastText embeddings, please refer to the notebook ``logReg+fastText.ipynb``
