@@ -27,4 +27,4 @@ The experiments of the XGBoost experiments can be found in ``xgboost_with_glove.
 
 ## Logistic Regression
 
-To replicate the results of our logistic regression baseline, which uses fastText embeddings, please refer to the notebook ``logReg+fastText.ipynb``
+To replicate the results of our logistic regression baseline, which uses fastText embeddings, please refer to the notebook ``LogReg+fastText.ipynb``
